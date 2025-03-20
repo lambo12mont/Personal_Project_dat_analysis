@@ -10,13 +10,6 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
-# Install and load tidyverse packages
-```{r}
-## install.packages("tidyverse") # Delete this line once installed
-library("tidyverse")
-```
-
-
 # Load the data (mpg is built into ggplot2)
 ```{r}
 data(mpg)
@@ -94,11 +87,25 @@ ggplot(data = mpg) +
 ```
 
 
+# Question 1:
+#### What happens if you map an aesthetic to something other than a variable name, like aes(colour = displ < 5)? Note, you’ll also need to specify x and y.
+
+```{r}
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(colour = displ < 5), color = "blue")
+```
+
+# Answer:
+#### The function aes() requires x and y to be specified. In this case an error occured and the chunk could not be run
+
+
 # Troubleshooting 
 
+## Example of a common mistake
 
-
-
+#### ggplot(data = mpg) 
+#### + geom_point(mapping = aes(x = displ, y = hwy)) 
+#### # the + should be on top line
 
 
 # Faceting
@@ -126,7 +133,7 @@ Note that there are no occurrences of 5 cylinder 4WDs OR RWD vehicles!
 ```{r}
 ggplot(data = mpg) + 
   geom_point(mapping = aes(x = displ, y = hwy)) + 
-  facet_grid(cyl ~ .)
+  facet_grid(. ~ drv)
   #facet_grid(. ~ cyl) # Alternatively
 
 ```
@@ -135,9 +142,11 @@ ggplot(data = mpg) +
 Read ?facet_wrap. What does nrow do? What does ncol do? What other options control the layout of the individual panels? 
 
 ```{r}
-
+?facet_wrap
 ```
 
+#### nrow and ncol determine the number of rows and column in the grid, respectively.
+#### dir is another option that permit to control the layout of the panels
 
 # Lines
 We already used points:
