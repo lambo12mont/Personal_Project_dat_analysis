@@ -666,6 +666,148 @@ ggsave("my-plot.pdf")
 
 # 3.10 Assignment: End-to-end data analysis in R
 
+## Importing the dataframe
+
+```{r}
+install.packages("janitor")
+library("janitor")
+
+data_frame <- read.csv("../data/export.csv") |> 
+  row_to_names(row_number = 1) |>
+  clean_names()
+head(data_frame)
+```
+
+```{r}
+combination <- data_frame |>
+  select(x | contains("Combination")) |>  
+  row_to_names(row_number = 1) |>
+  mutate(across(is.character, as.numeric)) |>
+  filter(!is.na(CalendarYear))
+  
+diving <- data_frame |>
+  select(x | contains("diving")) |>  
+  row_to_names(row_number = 1) |>
+  mutate(across(is.character, as.numeric)) |>
+  filter(!is.na(CalendarYear))
+
+line <- data_frame |>
+  select(x | contains("line")) |>  
+  row_to_names(row_number = 1) |>
+  mutate(across(is.character, as.numeric)) |>
+  filter(!is.na(CalendarYear))
+
+other <- data_frame |>
+  select(x | contains("other")) |>  
+  row_to_names(row_number = 1) |>
+  mutate(across(is.character, as.numeric)) |>
+  filter(!is.na(CalendarYear))
+
+net <- data_frame |>
+  select(x | contains("net")) |>  
+  row_to_names(row_number = 1) |>
+  mutate(across(is.character, as.numeric)) |>
+  filter(!is.na(CalendarYear))
+```
+
+```{r}
+comb_clean <- subset(combination, select = -c(Tonnes, DiscardNumber))
+comb_clean <- na.omit(comb_clean)
+
+diving_clean <- subset(diving, select = -c(Tonnes, DiscardNumber))
+diving_clean <- na.omit(diving_clean)
+
+line_clean <- subset(line, select = -c(Tonnes, DiscardNumber))
+line_clean <- na.omit(line_clean)
+
+other_clean <- subset(other, select = -c(Tonnes, DiscardNumber))
+other_clean <- na.omit(other_clean)
+
+net_clean <- subset(net, select = -c(Tonnes, DiscardNumber))
+net_clean <- na.omit(net_clean)
+```
+
+
+## If you want wide data do this
+
+```{r}
+comb_clean_wide <- comb_clean |>
+  rename(comb_licence = comb_licence, 
+         comb_days = comb_days)
+
+line_clean_wide <- line_clean|>
+  rename(line_licence = Licences, 
+         line_days = Days)
+
+other_clean_wide <- other_clean|>
+  rename(other_licence = Licences, 
+         other_days = Days)
+
+diving_clean_wide <- diving_clean|>
+  rename(diving_licence = Licences, 
+         diving_days = Days)
+```
+
+```{r}
+join_data <- comb_clean |>
+  full_join(line_clean) |>
+  full_join(other_clean) |>
+  full_join(diving_clean)
+```
+If you want  long data do this (hint - do this)
+
+
+```{r}
+comb_clean_long <- comb_clean |>
+  mutate(Fish_type = "Combined")
+
+line_clean_long <- line_clean|>
+  mutate(Fish_type = "Line")
+
+other_clean_long <- other_clean|>
+  mutate(Fish_type = "Other")
+
+diving_clean_long <- diving_clean|>
+  mutate(Fish_type = "Diving")
+```
+```{r}
+all_data <- bind_rows(comb_clean_long, line_clean_long, other_clean_long, diving_clean_long)
+
+
+```
+ 
+ 
+```{r}
+ggplot(all_data, aes(x = CalendarYear, y = Licences, color = Fish_type)) +
+  geom_line(size = 1) +
+  theme_minimal() +
+  labs(title = "LIcences per year per fish type",
+       y = "Licences number",
+       x = "Year")
+```
+ 
+
+```{r}
+library(ggplot2)
+library(tidyr)
+library(dplyr)
+
+long_data <- all_data |>
+  pivot_longer(cols = c(Licences, Days), names_to = "Variable", values_to = "Value") |>
+  mutate
+
+# Scale the days of linefishing because too high and prevent the other values to stand out in the graph
+
+
+# Plot both Licences and Days over CalendarYear
+ggplot(long_data, aes(x = CalendarYear, y = Value, color = Variable, linetype = Variable)) +
+  geom_line(size = 1) +
+  facet_wrap(~Fish_type, scales = "free") +  # Optional: to separate by fish type
+  theme_minimal() +
+  labs(title = "Licences and Days per Year",
+       x = "Year",
+       y = "Value")
+```
 
 
 
