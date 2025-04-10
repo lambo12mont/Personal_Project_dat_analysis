@@ -914,3 +914,113 @@ df <- tribble(
 
 ```
 
+
+## Dataset with three variables
+
+```{r}
+df |> 
+  pivot_longer(
+    cols = bp1:bp2,
+    names_to = "measurement",
+    values_to = "value"
+  )
+
+```
+
+## 4.5.3
+
+
+```{r}
+cms_patient_experience
+```
+
+```{r}
+cms_patient_experience |> 
+  distinct(measure_cd, measure_title)
+
+```
+
+## pivot_wider() needs existing column that specify the values and the names
+
+```{r}
+cms_patient_experience |> 
+  pivot_wider(
+    names_from = measure_cd,
+    values_from = prf_rate
+  )
+
+```
+
+## Still organization spread in different rows. Bring them together with pivot_wider()
+
+```{r}
+cms_patient_experience |> 
+  pivot_wider(
+    id_cols = starts_with("org"),
+    names_from = measure_cd,
+    values_from = prf_rate
+  )
+
+```
+
+
+## 4.5.4
+
+## Tribble with blood pressure of two patients
+
+```{r}
+df <- tribble(
+  ~id, ~measurement, ~value,
+  "A",        "bp1",    100,
+  "B",        "bp1",    140,
+  "B",        "bp2",    115, 
+  "A",        "bp2",    120,
+  "A",        "bp3",    105
+)
+
+
+```
+
+```{r}
+df |> 
+  pivot_wider(
+    names_from = measurement,
+    values_from = value
+  )
+
+```
+
+```{r}
+df |> 
+  distinct(measurement) |> 
+  pull()
+
+```
+
+```{r}
+df |> 
+  select(-measurement, -value) |> 
+  distinct()
+
+
+```
+
+## plot_wider combines the values to create an empty dataframe
+
+```{r}
+df |> 
+  select(-measurement, -value) |> 
+  distinct() |> 
+  mutate(x = NA, y = NA, z = NA)
+
+```
+
+## 4.5.5 Exercise
+
+## 4.5.6 Separating and uniting data tables
+
+```{r}
+table3
+
+```
+
