@@ -817,9 +817,100 @@ ggplot(long_data, aes(x = CalendarYear, y = Value, color = Variable, linetype = 
 
 # Workshop 3 - Data wrangling in R
 
-# 4.
+# 4.4.1 Excercise
 
 ```{r}
 library(tidyverse)
+``
+
+
+## Computing rate in table 1
+
+```{r}
+table1 |>
+  mutate(rate = cases / population * 10000)
+
+```
+
+## Computing per year
+
+```{r}
+table1 %>% 
+  count(year, wt = cases)
+
+```
+
+## Let's see changes over time
+
+```{r}
+library(ggplot2)
+ggplot(table1, aes(year, cases)) + 
+  geom_line(aes(group = country), colour = "grey50") + 
+  geom_point(aes(colour = country))
+
+```
+
+
+# 1.
+## Table 1
+#### First column represent the country where the data were taken; 
+#### Second column shows the years; 
+#### Third column shows the number of cases of an occurrence within the population; 
+#### Fourth column represent the population count of the country in that year; 
+#### Fifth column represents the ratio between the cases and the entire population 
+
+##Table 2
+#### Column 1: Country
+#### Column 2: year
+#### Column 3: Type of count
+#### Cloumn 4: Count of the cases or population
+
+## Table 3
+#### Column 1: Country
+#### Column 2: year
+#### Column 3: rate between casea and population
+
+# 2.
+## a.
+#### Create a dataset that contains count specifying each country and year where "type" is "cases"
+#### Repeat specifying "population" as a type
+
+
+## pivot_longer() in Billboard dataset
+
+```{r}
+billboard |> 
+  pivot_longer(
+    cols = starts_with("wk"), 
+    names_to = "week", 
+    values_to = "rank"
+  )
+
+```
+
+## Dropping the NA values will make the dataset shorter
+
+```{r}
+billboard |> 
+  pivot_longer(
+    cols = starts_with("wk"), 
+    names_to = "week", 
+    values_to = "rank",
+    values_drop_na = TRUE
+  )
+
+```
+
+## 4.5.2
+
+```{r}
+df <- tribble(
+  ~id,  ~bp1, ~bp2,
+   "A",  100,  120,
+   "B",  140,  115,
+   "C",  120,  125
+)
+
+
 ```
 
