@@ -678,6 +678,8 @@ data_frame <- read.csv("../data/export.csv") |>
 head(data_frame)
 ```
 
+## Clean the dataset removing missing values, variable of no interest and extracting subset of different fishing mode
+
 ```{r}
 combination <- data_frame |>
   select(x | contains("Combination")) |>  
@@ -729,11 +731,12 @@ net_clean <- na.omit(net_clean)
 
 
 ## If you want wide data do this
+## Create wide-format versions of each cleaned dataset by renaming the columns to specific fishing method
 
 ```{r}
 comb_clean_wide <- comb_clean |>
-  rename(comb_licence = comb_licence, 
-         comb_days = comb_days)
+  rename(comb_licence = Licences, 
+         comb_days = Days)
 
 line_clean_wide <- line_clean|>
   rename(line_licence = Licences, 
@@ -748,14 +751,16 @@ diving_clean_wide <- diving_clean|>
          diving_days = Days)
 ```
 
+## Join single dataset together, searching and joining columns with shared names
+
 ```{r}
 join_data <- comb_clean |>
   full_join(line_clean) |>
   full_join(other_clean) |>
   full_join(diving_clean)
 ```
-If you want  long data do this (hint - do this)
-
+## If you want  long data do this (hint - do this)
+## Add a new column "Fish_type" to each single dataset with the same value for each row (same fishing method in the single dataset)
 
 ```{r}
 comb_clean_long <- comb_clean |>
@@ -770,22 +775,33 @@ other_clean_long <- other_clean|>
 diving_clean_long <- diving_clean|>
   mutate(Fish_type = "Diving")
 ```
+
+## Combine all four datasets into one long-format dataset.
+## The command bind_rows() stacks the rows from all the datasets vertically.
+
 ```{r}
 all_data <- bind_rows(comb_clean_long, line_clean_long, other_clean_long, diving_clean_long)
 
 
 ```
  
- 
+## Create a graph to visualize the licences per year for each fishing method
+
+
 ```{r}
+all_data$CalendarYear <- as.numeric(as.character(all_data$CalendarYear))
 ggplot(all_data, aes(x = CalendarYear, y = Licences, color = Fish_type)) +
   geom_line(size = 1) +
+  scale_x_continuous(breaks = pretty(all_data$CalendarYear)) + 
   theme_minimal() +
   labs(title = "LIcences per year per fish type",
        y = "Licences number",
        x = "Year")
 ```
  
+## This line graph shows the number of licences issued each year, grouped by fishing method (Fish_type). 
+## Trends over time are illustrated for each method: Combined, Line, Diving, and Other.
+## This allows for comparison in licence activity across different fishery types over time.
 
 ```{r}
 library(ggplot2)
@@ -793,8 +809,7 @@ library(tidyr)
 library(dplyr)
 
 long_data <- all_data |>
-  pivot_longer(cols = c(Licences, Days), names_to = "Variable", values_to = "Value") |>
-  mutate
+  pivot_longer(cols = c(Licences, Days), names_to = "Variable", values_to = "Value") 
 
 # Scale the days of linefishing because too high and prevent the other values to stand out in the graph
 
@@ -808,6 +823,11 @@ ggplot(long_data, aes(x = CalendarYear, y = Value, color = Variable, linetype = 
        x = "Year",
        y = "Value")
 ```
+
+## This graph shows trends over time for both the number of licences and fishing days, separated by fishing method.
+## Each panel (facet) represents a different fishing type, with lines distinguishing between licences and days. 
+## This layout allows easy comparison of fishing effort and activity across methods and years.
+## It's interesting to notice how different fishing methods show a sharp rise in days in different periods, mostly corresponding to a less sharp ## amount in licences for the same years.
 
 
 
@@ -1019,8 +1039,12 @@ df |>
 
 ## 4.5.6 Separating and uniting data tables
 
+##  Separating a column in two values
 ```{r}
 table3
+
+table3 %>% 
+  separate(rate, into = c("cases", "population"))
 
 ```
 
